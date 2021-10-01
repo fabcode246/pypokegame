@@ -3,8 +3,10 @@ import asyncio
 import random as r
 from time import sleep as s
 
-def i(q=False):
-    if q:
+def i(q=False, text=None):
+    if text:
+        resp = input("{}: ".format(text))
+    elif q:
         resp = input("answer: ")
     else:
         resp = input("type: ")
@@ -80,10 +82,12 @@ class Game:
             self.player = Player(name, starter)
             p("now type info and get info about your fav pokemon", r=False)
             ans = i()
-            while ans is not "info":
+            while ans != "info":
                 p("type info", r=False)
             if ans == "info":
                 self.info()
+                p("good now you can type help to see all the things you can do. Enjoy!!", r=False)
+                self.loop()
 
     def loop(self):
         runner = True
@@ -91,8 +95,22 @@ class Game:
             command = i()
             if command == "info":
                 self.info()
+            if command == "quit":
+                yn = i(text="are you sure you want to quit?(y/n)")
+                if yn == "y" or yn == "yes":
+                    break
 
     def info(self):
-        self.player.fav
+        pokemon = self.player.fav
+        lvl = round(((pokemon.exp / round(pokemon.lvl * 1.23 * 15)) * 100) / 5)
+        lvlbar = "["
+        lvlbar += "+" * lvl
+        lvlbar += " " * (20-lvl)
+        lvlbar += "]"
+        text = f"""#{pokemon.name}
+ {lvlbar}
+ lvl: {pokemon.lvl}
+ exp: {pokemon.exp}"""
+        print(text)
 
 Game()
