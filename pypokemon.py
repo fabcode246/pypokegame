@@ -21,11 +21,28 @@ async def request(req):
         async with session.get(link) as response:
             return await response.json()
 
+class Move:
+    def __init__(self, info):
+        self.name = info["move"]["name"]
+        self.learned_at = info["version_group_details"]["level_learned_at"]
+        data = asyncio.run(request(info['move']['url'][26:]))
+        self.power = data["power"]
+        self.max_pp = data["pp"]
+        self.pp = data["pp"]
+        self.accuracy = data["accuracy"]
+        self.id = data[id]
+        self.stat_changes = data["stat_changes"]
+        self.type = data["type"]["name"]
+
 class Pokemon:
     def __init__(self, data):
+        #print(data)
         self.name = data["name"]
         self.nick = ''
-        self.abilities = data["abilities"]
+        self.types = []
+        for t in data["types"]:
+            self.types.append(t['type']['name'])
+        self.all_moves = data["moves"]
         self.moves = []
         self.held = None
         stats = self.set_stats(data["stats"])
@@ -35,6 +52,10 @@ class Pokemon:
         self.sp_attack = stats["special-attack"]
         self.sp_defense = stats["special-defense"]
         self.speed = stats["speed"]
+        self.base_exp = data['base_experience']
+        species = asyncio.run(request(data['species']['url'][26:]))
+        self.evo = asyncio.run(request(species['evolution_chain']['url'][26:]))
+        print(self.evo)
         self.exp = 0
         self.lvl = 1
 
@@ -165,7 +186,8 @@ nothing - travel and maybe meet wild pokemons"""
         while True:
             resp = int(i(text=f"what will {self.player.name} do? fight(1)/switch pokemon(2)/flee(3)"))
             if resp == 1:
-                move = int(i(text=f"what will {poke.name} do? {poke.move1}(1)/{poke.move2}(2)/{poke.move3}(3)/{poke.move1}(4)"))
+                move = int(i(text=f"what will {poke.name} do? {poke.moves[0]}(1)/{poke.moves[1]}(2)/{poke.moves[2]}(3)/{poke.moves[3]}(4)"))
+
             if resp == 2:
                 string = f"1-{self.player.team[0].name}({self.player.team[0].lvl})[{self.player.team[0].hp+self.player.team[0].attack+self.player.team[0].defense+self.player.team[0].sp_attack+self.player.team[0].sp_defense+self.player.team[0].speed}]"
                 if len(self.player.team) > 1:
