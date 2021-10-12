@@ -196,9 +196,10 @@ class Game:
     def loop(self):
         runner = True
         while runner:
-            command = i().split()
+            raw_command = i()
+            command = raw_command.split()
             # the adventure, 1/3 chance of encountering wild pokemons
-            if command[0] == "":
+            if raw_command == "":
                 ns = [1,2,3]
                 n = r.choice(ns)
                 if n == 1:
@@ -253,7 +254,7 @@ nothing - travel and maybe meet wild pokemons"""
             for i in pokemon.moves:
                 text += f"\n  {pokemon.moves.index(i)+1} {i.name}"
         else:
-            text += "  no moves"
+            text += "\n  no moves"
         print(text)
 
     # shows the profile of the player
@@ -269,7 +270,7 @@ nothing - travel and maybe meet wild pokemons"""
     def battle(self, enemy):
         poke = Competant(self.player.fav)
         enemy = Competant(enemy)
-        print(f"Go {poke.nick} {poke.name}!")
+        print(f"Go {poke.name}!")
 
         # battle loop
         while True:
@@ -277,8 +278,16 @@ nothing - travel and maybe meet wild pokemons"""
 
             # fight
             if resp == 1:
-                move_num = int(i(text=f"what will {poke.name} do? {poke.moves[0]}(1)/{poke.moves[1]}(2)/{poke.moves[2]}(3)/{poke.moves[3]}(4)"))
-                poke.move = poke.moves[move_num]
+                text = f"what will {poke.name} do? "
+                if len(poke.moves) != 0:
+                    for m in poke.moves:
+                        text += f"{m.name}({poke.moves.index(m)+1})"
+                        if poke.moves.index(m)+1 != 4:
+                            text += "/"
+                else:
+                    text += "no moves"
+                move_num = int(i(text=text))
+                poke.move = poke.moves[move_num-1]
                 enemy.move = r.choice(enemy.moves)
 
                 # comparing speed to see who uses move first
