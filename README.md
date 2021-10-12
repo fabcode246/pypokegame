@@ -27,4 +27,4 @@ clone repo
 
 then run the pypokegame.py file
 
-`python3 pypokegame.py`
+`python3 pypokemon.py`
