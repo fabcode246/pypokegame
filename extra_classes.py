@@ -23,8 +23,9 @@ class Battle:
             resp = int(i(text=f"what will {self.player.name} do? fight(1)/switch pokemon(2)/flee(3)"))
 
             # fight
-            if resp == 1:        
-                text = f"what will {self.team[self.poke].name} do? "
+            if resp == 1:
+                print(self.poke)
+                text = f"what will {self.team[self.poke].name} do?"
                 if len(self.team[self.poke].moves) != 0:
                     for m in self.team[self.poke].moves:
                         text += f"{m.name}({self.team[self.poke].moves.index(m)+1})"
@@ -43,21 +44,24 @@ class Battle:
                 else:
                     attacker1 = self.enemy_team[self.enemy_index]
                     attacker2 = self.team[self.poke]
-                
+
                 dmg = None
 
                 # attacker 1 uses move
                 print(f"{attacker1.name} used {attacker1.move.name}")
                 # physical type move
                 if attacker1.move.damage_class == 1:
+                    print(attacker1.move.power)
                     dmg = ((attacker1.lvl/5+2) * attacker1.move.power * (attacker1.attack / attacker2.defense)) / 50 + 2
+                    dmg = round(dmg)
                 # special type move
                 elif attacker1.move.damage_class == 2:
                     dmg = (((attacker1.lvl* 2)/5+2) * attacker1.move.power * (attacker1.sp_attack / attacker2.sp_defense)) / 50 + 2
+                    dmg = round(dmg)
                 # status type move
                 elif attacker1.move.damage_class == 3:
                     # target to whom to apply the status changes
-                    target = (attacker1, attacker2)[attacker1.move.target]
+                    target = (attacker1, attacker2)[attacker1.move.target-1]
                     # checking which status to change
                     if attacker1.move.stat_change_stat == "hp":
                         target.hp += attacker1.move.stat_change_amount
@@ -77,32 +81,48 @@ class Battle:
                     print(f"{attacker2.name} lost {dmg} hp!")
                     if attacker2.hp <= 0:
                         attacker2.fainted = True
-                        print("{attacker2.name} fainted")
+                        print(f"{attacker2.name} fainted")
                         if attacker2.enemy:
                             alive = []
-                            for p in enemy_team:
+                            for p in self.enemy_team:
                                 if not p.fainted:
                                     alive.append(p)
-                            enemy = enemy_team.index(r.choice(alive))
+                            if len(alive) != 0:
+                                self.enemy = enemy_team.index(r.choice(alive))
+                            else:
+                                print("you won!!!")
+                                return
                         else:
-                            string = f"1-{self.team[0].name}({self.team[0].lvl})[{self.team[0].hp+self.team[0].attack+self.team[0].defense+self.team[0].sp_attack+self.team[0].sp_defense+self.team[0].speed}]"
-                            if len(team) > 1:
-                                for mon in self.team[1:]:
-                                    string += f" | {self.player.team.index(mon)+1}-{mon.name}({mon.lvl})[{mon.hp+mon.attack+mon.defense+mon.sp_attack+mon.sp_defense+mon.speed}]"
-                            n = int(i(text="choose the pokemon using its number"))
-                            self.poke = [n-1]
+                            string = ""
+                            alive = []
+                            for mon in self.team:
+                                if not mon.fainted:
+                                    if len(alive) != 0:
+                                        string += ' | '
+                                    string += f"{self.player.team.index(mon)+1}-{mon.name}({mon.lvl})[{mon.hp+mon.attack+mon.defense+mon.sp_attack+mon.sp_defense+mon.speed}]"
+                                    alive.append(mon)
+                            print(string)
+                            if len(alive) != 0:
+                                n = int(i(text="choose the pokemon using its number"))
+                                self.poke = n-1
+                            else:
+                                print("all your pokemons fainted. you lost :(")
+                                return
 
                 # attacker 2 uses move
                 print(f"{attacker2.name} used {attacker2.move.name}")
 
                 if attacker2.move.damage_class == 1:
+                    print(attacker1.move.power)
                     dmg = ((attacker2.lvl/5+2) * attacker2.move.power * (attacker2.attack / attacker1.defense)) / 50 + 2
+                    dmg = round(dmg)
 
                 elif attacker2.move.damage_class == 2:
                     dmg = (((attacker2.lvl* 2)/5+2) * attacker2.move.power * (attacker2.sp_attack / attacker1.sp_defense)) / 50 + 2
+                    dmg = round(dmg)
 
                 elif attacker2.move.damage_class == 3:
-                    target = (attacker2, attacker1)[attacker2.move.target]
+                    target = (attacker2, attacker1)[attacker2.move.target-1]
                     if attacker2.move.stat_change_stat == "hp":
                         target.hp += attacker2.move.stat_change_amount
                     if attacker2.move.stat_change_stat == "attack":
@@ -121,20 +141,33 @@ class Battle:
                     print(f"{attacker1.name} lost {dmg} hp!")
                     if attacker1.hp <= 0:
                         attacker1.fainted = True
-                        print("{attacker1.name} fainted")
+                        print(f"{attacker1.name} fainted")
                         if attacker1.enemy:
                             alive = []
-                            for p in enemy_team:
+                            for p in self.enemy_team:
                                 if not p.fainted:
                                     alive.append(p)
-                            enemy = enemy_team.index(r.choice(alive))
+                            if len(alive) != 0:
+                                self.enemy = enemy_team.index(r.choice(alive))
+                            else:
+                                print("you won!!!")
+                                return
                         else:
-                            string = f"1-{self.team[0].name}({self.team[0].lvl})[{self.team[0].hp+self.team[0].attack+self.team[0].defense+self.team[0].sp_attack+self.team[0].sp_defense+self.team[0].speed}]"
-                            if len(team) > 1:
-                                for mon in self.team[1:]:
-                                    string += f" | {self.player.team.index(mon)+1}-{mon.name}({mon.lvl})[{mon.hp+mon.attack+mon.defense+mon.sp_attack+mon.sp_defense+mon.speed}]"
-                            n = int(i(text="choose the pokemon using its number"))
-                            self.poke = [n-1]
+                            string = ""
+                            alive = []
+                            for mon in self.team:
+                                if not mon.fainted:
+                                    if len(alive) != 0:
+                                        string += ' | '
+                                    string += f"{self.player.team.index(mon)+1}-{mon.name}({mon.lvl})[{mon.hp+mon.attack+mon.defense+mon.sp_attack+mon.sp_defense+mon.speed}]"
+                                    alive.append(mon)
+                            print(string)
+                            if len(alive) != 0:
+                                n = int(i(text="choose the pokemon using its number"))
+                                self.poke = n-1
+                            else:
+                                print("all your pokemons fainted. you lost :(")
+                                return
 
             # switch pokemon
             if resp == 2:
@@ -152,7 +185,7 @@ class Battle:
             # fleeing
             if resp == 3:
                 # comparing speed if faster than the other pokemon then you can flee
-                if compare(self.team[self.poke].speed, self.enemy_team[self.enemy].speed) != -1:
+                if compare(self.team[self.poke].speed, self.enemy_team[self.enemy_index].speed) != -1:
                     print("You fled from the battle!")
                     break
                 else:

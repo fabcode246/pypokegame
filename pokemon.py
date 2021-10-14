@@ -64,6 +64,8 @@ class Move:
         self.damage_class = 1 if damage_class == "physical" else 2 if damage_class == "special" else 3
         self.target = 1 if data["target"]['name'] == 'user' else 2
         self.power = data["power"]
+        if self.power == None:
+            self.power = 0
         self.max_pp = data["pp"]
         self.pp = data["pp"]
         self.accuracy = data["accuracy"]

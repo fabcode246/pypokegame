@@ -43,7 +43,7 @@ class Game:
                 if n == 1:
                     # wild pokemon spawning
                     wild_mon = Poke().get_rand_mon(self.player.steps)
-                    print(f"A wild {wild_mon.name} appeared!", self.player.steps)
+                    print(f"A wild {wild_mon.name} appeared!")
                     Battle(self.player, [wild_mon])
             elif command[0] in ["h", "help"]:
                 text = """HELP
